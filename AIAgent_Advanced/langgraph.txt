@@ -1,0 +1,57 @@
+LangGraph가 무엇인지부터 확인하기
+agent의 처리과정을 사용자가 단계별로 지정하여 state machine처럼 로직의 흐름을 관리할 수 있도록 하는 것
+node와 edge로 구성되어있고, agent의 실행 단계는 state로 저장!!
+nodes - entity, concept 단순 실행 같은 것들
+edges - node들간의 관계 연결성
+
+LangGraph를 이해할 때 고려해야 할 주요 요소
+1Graph(모식도) 기반의 지식 표현 방식 - graph를 지식 표현 형태로 사용
+2NLP - 자연어 처리 과정을 통해 사용자의 입력을 받아들임
+3추론을 하고 그에 따라 분기를 결정함!!
+4상호작용 후에 대화 내용 관리
+
+LangGraph가 AI Agent를 만들 때 어떻게 도움이 되는가?
+
+1지식 관리가 쉬워짐
+Graph를 이용하여 지식을 관리하는데, 이 지식 관리가 매우 간편해짐
+
+2자연어 이해 증가
+NLP와 그래프 기반 표현은 agent를 생성할 때 아주 좋은 조합이 됨
+
+3효율적인 추론과 분기 결정
+그래프 기반의 추론은 agent의 효율을 높여 줌
+
+4확장성과 유연성
+graph를 이용하여 큰 데이터셋과 복잡한 상호작용을 쉽게 늘릴 수 있음
+
+LangGraph는 Langchin의 확장인데, graph를 지원
+반복되는 graph를 만들 수 있음
+기존의 대화, 맥락 등을 기억하게 할 수 있음
+또한 사람의 반응, 피드백 등을 반복되는 곳에 포함 시킬 수 있음
+
+LangGraph의 가장 간단한 Flow Diagram을 보면
+Nodes - Agents(entities) / 함수
+Edges - nodes 연결(관계 relationships)
+Conditional Edges - 결정 - 어느 노드로 이동할 지 결정함
+
+Agent node
+Conditional edge로 action을 처리하고
+거기서 얻은 정보를 다시 Agent node로 되돌리거나
+End node로 이동하여 agent의 행동을 멈추게 할 수 있음
+또한 langgraph에서는 Entry point node, end node가 있으며
+이 둘은 반드시 있어야 함
+
+LangGraph의 Data, State
+node에서 실행된 그 결과, 입력된 데이터 등은 State에 data로 저장
+state는 graph의 모든 과정에서 접근 가능
+graph 별로 관리, 즉 서로 다른 graph끼리는 독립적이라는 것
+또한 database등으로 저장할 수 있음
+
+LangGraph의 기본 튜토리얼은
+langchain-ai.github.io/langgraph/tutorials/
+쪽에서 확인할 수 있음
+
+
+LangGraph의 Basic Agent에 도구를 더해보기!
+
+agent가 결정을 내리기 전에 도구의 내용을 확인해보기
