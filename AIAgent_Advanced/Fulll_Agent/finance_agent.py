@@ -129,6 +129,14 @@ def research_critique_node(state: AgentState):
       content.append(r.get("content"))
   return {"content": content}
 
+def collect_feedback_node(state: AgentState):
+  messages = [
+    SystemMessage(content=FEEDBACK_PROMPT),
+    HumanMessage(content=state.get("comparison")),
+  ]
+  response = model.invoke(messages)
+  return {"feedback": response.content}
+
 def write_report_node(state: AgentState):
   messages = [
     SystemMessage(content=WRITE_REPORT_PROMPT),
@@ -136,3 +144,66 @@ def write_report_node(state: AgentState):
   ]
   response = model.invoke(messages)
   return {"report": response.content}
+
+def should_continue(state):
+  if state.get("revision_number") > state.get("max_revisions"):
+    return END
+  return "collect_feedback"
+
+
+builder = StateGraph(AgentState)
+
+builder.add_node("gather_financials", gather_financials_node)
+builder.add_node("analyze_data", analyze_data_node)
+builder.add_node("research_competitors", research_competitors_node)
+builder.add_node("compare_performance", compare_performance_node)
+builder.add_node("collect_feedback", collect_feedback_node)
+builder.add_node("research_critique", research_critique_node)
+builder.add_node("write_report", write_report_node)
+
+builder.set_entry_point("gather_financials")
+
+builder.add_conditional_edges(
+  "compare_performance",
+  should_continue,
+  {END: END, "collect_feedback": "collect_feedback"},
+)
+
+builder.add_edge("gather_financials", "analyzedata")
+builder.add_edge("analyze_data", "research_competitors")
+builder.add_edge("research_competitors", "compare_performance")
+builder.add_edge("collect_feedback", "research_critique")
+builder.add_edge("research_critique", "compare_performance")
+builder.add_edge("compare_performance", "write_report")
+
+graph = builder.compile(checkpointer=memory)
+
+def read_csv_file(file_path):
+  with open(file_path, "r") as file:
+    print("Reading CSV file...")
+    return file.read()
+
+
+if __name__ == "__main__":
+  task = "Analyze the financial performance of our () company"
+  competitors = ["Microsoft", "Nvidia", "Google"]
+  csv_file_path = (
+    "./data/financials.csv"
+  )
+
+if not os.path.exists(csv_file_path):
+  print(f"csv file not found at {csv_file_path}")
+else:
+  print("Starting the conversation")
+  csv_data = read_csv_file(csv_file_path)
+  initial_state = {
+    "task": task,
+    "competitors": competitors,
+    "csv_file": csv_data,
+    "max_revisions": 2,
+    "revision_number": 1,
+  }
+  thread = {"configurable": {"thread_id": "1"}} # 사용자 구분 필요
+
+for s in graph.stream(initial_state, thread):
+  print(s)
