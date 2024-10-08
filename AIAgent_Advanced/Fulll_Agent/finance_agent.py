@@ -178,6 +178,7 @@ builder.add_edge("compare_performance", "write_report")
 
 graph = builder.compile(checkpointer=memory)
 
+==============Console Testing============================
 def read_csv_file(file_path):
   with open(file_path, "r") as file:
     print("Reading CSV file...")
@@ -207,3 +208,58 @@ else:
 
 for s in graph.stream(initial_state, thread):
   print(s)
+============ Console Testing===============================
+
+===========Streamlit UI==========================
+import streamlit as st
+
+def main():
+  st.title("Financial Performance Reporting Agent")
+  
+  task = st.text_input(
+    "Enter the task",
+    "Analyze the financial performance of our company (MYAICo.AI) compared to competitors",
+  )
+  competitors = st.text_area("Enter competitor names (one per line):").split("\n")
+  max_revisions = st.number_input("Max Revisions", min_value=1, value=2)
+  upload_file = st.file_uploader(
+    "Upload a CSV file with the company's financial data", type=["csv"], 
+  )
+
+if st.button("Start Analysis") and uploaded_file is not None:
+  csv_data = uploaded_file.getvalue().decode("utf-8")
+  initial_state={
+    "task": task,
+    "competitors": competitors,
+    "csv_file": csv_data,
+    "max_revisions": 2,
+    "revision_number": 1,
+  }
+  thread = {"configurable": {"thread_id": "1"}}
+
+final_state = None
+for s in graph.stream(initial_state, thread):
+  st.write(s)
+  final_state = s
+if final_state and "report" in final_state:
+  st.subheader("Final Report")
+  st.write(final_state.get("report"))
+
+if __name__ == "__main__":
+  main()
+
+  
+
+=================================================
+
+# agent는 최적화 할 수 있는 기술이 다양한 편
+# 모델 자체를 최적화하는 방법
+# 보다 효과적인 모델을.. 더 작은 단위들로 쪼개어 진행하기 - LLM 모델 변경
+# Model Quantization
+# Fine- Tuning
+# Parallel Processing
+# Distributed computing
+# Batch processing
+# Caching, Preprocessing
+# Data caching
+# Preprocessing
